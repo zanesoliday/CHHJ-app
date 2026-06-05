@@ -35,7 +35,6 @@
   }
   .app {
     width: 100%;
-    max-width: 430px;
     min-height: 100vh;
     background: #fff;
     display: flex;
@@ -124,18 +123,16 @@
     background: rgba(35,31,32,0.45);
     backdrop-filter: blur(2px);
     -webkit-backdrop-filter: blur(2px);
-    justify-content: flex-end;
+    justify-content: flex-start;
     align-items: flex-start;
   }
   .settings-overlay.open { display: flex; }
   .settings-panel {
     background: #fff;
     width: 100%;
-    max-width: 430px;
-    max-height: 90vh;
+    min-height: 100vh;
     overflow-y: auto;
-    border-radius: 0 0 var(--radius) var(--radius);
-    padding: 16px 16px 32px;
+    padding: 16px 16px 48px;
     box-shadow: 0 8px 32px rgba(0,0,0,0.22);
     animation: slideDown 0.22s ease;
   }
@@ -598,11 +595,11 @@
   }
   .reset-btn:hover { background: var(--gray-mid); border-color: #c8c4bc; }
 
-  @media (min-width: 431px) {
-    body { padding: 20px; align-items: center; }
-    .app { border-radius: 20px; min-height: auto; max-height: 90vh; overflow: hidden; box-shadow: 0 8px 40px rgba(0,0,0,0.18); }
+  @media (min-width: 700px) {
+    body { padding: 20px; align-items: flex-start; justify-content: center; }
+    .app { max-width: 480px; border-radius: 20px; min-height: auto; max-height: 90vh; overflow: hidden; box-shadow: 0 8px 40px rgba(0,0,0,0.18); }
     .content { overflow-y: auto; max-height: calc(90vh - 110px); }
-    .settings-panel { border-radius: 0 0 var(--radius) var(--radius); }
+    .settings-panel { max-width: 480px; max-height: 90vh; border-radius: 0 0 var(--radius) var(--radius); min-height: auto; }
   }
 </style>
 </head>
@@ -984,7 +981,7 @@ function calc() {
 
   if (alreadyBonus) {
     html += `<div class="result-card in-bonus">
-      <div class="rc-label">🎉 Already in bonus territory!</div>
+      <div class="rc-label">Already in bonus territory!</div>
       <div class="rc-value">$${bonusAmount.toFixed(2)}</div>
       <div class="rc-sub">Labor at ${(laborPct*100).toFixed(2)}% — target is ${(threshold*100).toFixed(0)}%</div>
     </div>`;
