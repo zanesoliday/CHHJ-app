@@ -1,0 +1,1145 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>CHHJ Bonus Calculator</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  :root {
+    --orange: #e87200;
+    --orange-light: #fff3e6;
+    --orange-hover: #cf6600;
+    --green: #006937;
+    --green-light: #e6f2ec;
+    --dark: #231f20;
+    --gray-bg: #f5f4f0;
+    --gray-mid: #dedad2;
+    --gray-text: #6e6a64;
+    --white: #ffffff;
+    --radius: 12px;
+    --radius-sm: 8px;
+    --border: 1.5px solid #dedad2;
+  }
+  html, body { height: 100%; }
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: #ece9e3;
+    color: var(--dark);
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    min-height: 100vh;
+    padding: 0;
+  }
+  .app {
+    width: 100%;
+    max-width: 430px;
+    min-height: 100vh;
+    background: #fff;
+    display: flex;
+    flex-direction: column;
+    position: relative;
+  }
+
+  /* HEADER */
+  .header {
+    background: var(--dark);
+    padding: 16px 16px 0;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    box-shadow: 0 2px 12px rgba(0,0,0,0.25);
+  }
+  .header-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+  }
+  .logo-text {
+    font-size: 10px;
+    font-weight: 800;
+    color: var(--orange);
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+  }
+  .app-title {
+    font-size: 20px;
+    font-weight: 800;
+    color: #fff;
+    margin-top: 2px;
+  }
+  .gear-btn {
+    background: rgba(255,255,255,0.1);
+    border: 1.5px solid rgba(255,255,255,0.2);
+    border-radius: 50%;
+    width: 36px;
+    height: 36px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 18px;
+    color: rgba(255,255,255,0.7);
+    transition: background 0.2s, color 0.2s, border-color 0.2s;
+    flex-shrink: 0;
+    margin-top: 4px;
+  }
+  .gear-btn:hover { background: rgba(255,255,255,0.18); color: #fff; border-color: rgba(255,255,255,0.4); }
+  .gear-btn.active { background: var(--orange); border-color: var(--orange); color: #fff; }
+
+  .tabs {
+    display: flex;
+    margin-top: 14px;
+  }
+  .tab {
+    flex: 1;
+    padding: 11px 8px;
+    font-size: 13px;
+    font-weight: 700;
+    font-family: 'DM Sans', sans-serif;
+    border: none;
+    background: transparent;
+    color: rgba(255,255,255,0.45);
+    cursor: pointer;
+    border-bottom: 2.5px solid transparent;
+    transition: color 0.2s, border-color 0.2s;
+    letter-spacing: 0.03em;
+    text-transform: uppercase;
+  }
+  .tab:hover { color: rgba(255,255,255,0.75); }
+  .tab.active { color: var(--orange); border-bottom-color: var(--orange); }
+
+  /* CONTENT */
+  .content { flex: 1; padding: 18px 16px 32px; display: none; }
+  .content.visible { display: block; }
+
+  /* SETTINGS OVERLAY */
+  .settings-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    z-index: 200;
+    background: rgba(35,31,32,0.45);
+    backdrop-filter: blur(2px);
+    -webkit-backdrop-filter: blur(2px);
+    justify-content: flex-end;
+    align-items: flex-start;
+  }
+  .settings-overlay.open { display: flex; }
+  .settings-panel {
+    background: #fff;
+    width: 100%;
+    max-width: 430px;
+    max-height: 90vh;
+    overflow-y: auto;
+    border-radius: 0 0 var(--radius) var(--radius);
+    padding: 16px 16px 32px;
+    box-shadow: 0 8px 32px rgba(0,0,0,0.22);
+    animation: slideDown 0.22s ease;
+  }
+  @keyframes slideDown {
+    from { transform: translateY(-18px); opacity: 0; }
+    to { transform: translateY(0); opacity: 1; }
+  }
+  .settings-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 18px;
+  }
+  .settings-title {
+    font-size: 16px;
+    font-weight: 800;
+    color: var(--dark);
+  }
+  .settings-close {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    border: 1.5px solid var(--gray-mid);
+    background: var(--gray-bg);
+    color: var(--dark);
+    font-size: 16px;
+    font-weight: 700;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background 0.15s;
+  }
+  .settings-close:hover { background: var(--gray-mid); }
+
+  /* LABELS */
+  .section-label {
+    font-size: 10px;
+    font-weight: 800;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--gray-text);
+    margin-bottom: 9px;
+    margin-top: 22px;
+  }
+  .section-label:first-child { margin-top: 0; }
+
+  /* CARD */
+  .card {
+    background: var(--gray-bg);
+    border-radius: var(--radius);
+    padding: 14px;
+    margin-bottom: 0;
+  }
+
+  /* CREW */
+  .crew-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 9px;
+  }
+  .crew-row:last-child { margin-bottom: 0; }
+  .position-select {
+    flex: 1;
+    padding: 10px 32px 10px 12px;
+    border: var(--border);
+    border-radius: var(--radius-sm);
+    font-size: 14px;
+    font-weight: 600;
+    font-family: 'DM Sans', sans-serif;
+    background: #fff url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24'%3E%3Cpath fill='%23231f20' d='M7 10l5 5 5-5z'/%3E%3C/svg%3E") no-repeat right 8px center;
+    color: var(--dark);
+    appearance: none;
+    -webkit-appearance: none;
+    cursor: pointer;
+  }
+  .position-select:focus { outline: none; border-color: var(--orange); }
+
+  .btn-remove {
+    width: 34px;
+    height: 34px;
+    border-radius: 50%;
+    border: 1.5px solid #c8c4bc;
+    background: #fff;
+    color: var(--dark);
+    font-size: 16px;
+    font-weight: 700;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    transition: background 0.15s, border-color 0.15s, color 0.15s;
+    line-height: 1;
+  }
+  .btn-remove:hover { background: #fde8d5; border-color: var(--orange); color: var(--orange); }
+
+  .btn-add-crew {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    margin-top: 10px;
+    padding: 9px 16px;
+    background: var(--dark);
+    color: #fff;
+    border: none;
+    border-radius: 20px;
+    font-size: 13px;
+    font-weight: 700;
+    font-family: 'DM Sans', sans-serif;
+    cursor: pointer;
+    transition: background 0.15s, opacity 0.15s;
+  }
+  .btn-add-crew:hover { background: #3a3335; }
+  .btn-add-crew:disabled { opacity: 0.35; cursor: not-allowed; background: var(--dark); }
+
+  /* INPUTS */
+  .input-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+    margin-bottom: 0;
+  }
+  .input-group { display: flex; flex-direction: column; gap: 5px; }
+  .input-group.full { grid-column: 1 / -1; }
+  .input-label {
+    font-size: 11px;
+    font-weight: 700;
+    color: var(--gray-text);
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+  }
+
+  .dollar-wrap {
+    position: relative;
+    display: flex;
+    align-items: center;
+  }
+  .dollar-wrap .dollar-sign {
+    position: absolute;
+    left: 12px;
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--gray-text);
+    pointer-events: none;
+    z-index: 1;
+  }
+  .dollar-wrap input { padding-left: 24px; }
+  .input-field {
+    width: 100%;
+    padding: 11px 12px;
+    border: var(--border);
+    border-radius: var(--radius-sm);
+    font-size: 15px;
+    font-weight: 600;
+    font-family: 'DM Sans', sans-serif;
+    background: #fff;
+    color: var(--dark);
+    transition: border-color 0.15s;
+  }
+  .input-field::placeholder { color: #b5b0a8; font-weight: 500; }
+  .input-field:focus { outline: none; border-color: var(--orange); }
+  .input-field.has-value + .dollar-sign { display: none; }
+
+  /* OUTPUT */
+  .output-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+    margin-bottom: 10px;
+  }
+  .stat-card {
+    background: var(--gray-bg);
+    border-radius: var(--radius-sm);
+    padding: 12px 14px;
+    border: 1px solid var(--gray-mid);
+  }
+  .stat-label { font-size: 11px; font-weight: 700; color: var(--gray-text); text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 5px; }
+  .stat-value { font-size: 20px; font-weight: 800; color: var(--dark); }
+
+  .result-card {
+    border-radius: var(--radius);
+    padding: 16px 18px;
+    margin-bottom: 10px;
+  }
+  .result-card.need-upsell { background: var(--orange-light); border: 1.5px solid #f5be88; }
+  .result-card.in-bonus { background: var(--green-light); border: 1.5px solid #7ec4a0; }
+  .result-card .rc-label { font-size: 11px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.07em; margin-bottom: 5px; }
+  .result-card.need-upsell .rc-label { color: #b85c00; }
+  .result-card.in-bonus .rc-label { color: var(--green); }
+  .result-card .rc-value { font-size: 32px; font-weight: 800; line-height: 1; margin-bottom: 4px; }
+  .result-card.need-upsell .rc-value { color: var(--orange); }
+  .result-card.in-bonus .rc-value { color: var(--green); }
+  .result-card .rc-sub { font-size: 13px; font-weight: 500; }
+  .result-card.need-upsell .rc-sub { color: #b85c00; }
+  .result-card.in-bonus .rc-sub { color: #005a2e; }
+
+  .bleed-note {
+    font-size: 12px;
+    color: var(--gray-text);
+    text-align: center;
+    margin-top: -4px;
+    margin-bottom: 10px;
+    font-style: italic;
+  }
+  .empty-state {
+    text-align: center;
+    padding: 32px 20px;
+    color: var(--gray-text);
+    font-size: 14px;
+    font-weight: 500;
+    background: var(--gray-bg);
+    border-radius: var(--radius);
+    border: 1px dashed var(--gray-mid);
+  }
+
+  /* UPSELL SIMULATOR */
+  .upsell-section {
+    background: var(--dark);
+    border-radius: var(--radius);
+    padding: 16px;
+    margin-top: 6px;
+  }
+  .upsell-title {
+    font-size: 11px;
+    font-weight: 800;
+    color: var(--orange);
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    margin-bottom: 12px;
+  }
+  .upsell-label {
+    font-size: 11px;
+    font-weight: 700;
+    color: rgba(255,255,255,0.5);
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    margin-bottom: 5px;
+  }
+  .upsell-dollar-wrap {
+    position: relative;
+    display: flex;
+    align-items: center;
+  }
+  .upsell-dollar-wrap .u-sign {
+    position: absolute;
+    left: 12px;
+    font-size: 15px;
+    font-weight: 600;
+    color: rgba(255,255,255,0.35);
+    pointer-events: none;
+    z-index: 1;
+  }
+  .upsell-input {
+    width: 100%;
+    padding: 12px 12px 12px 26px;
+    border: 1.5px solid rgba(255,255,255,0.15);
+    border-radius: var(--radius-sm);
+    font-size: 16px;
+    font-weight: 700;
+    font-family: 'DM Sans', sans-serif;
+    background: rgba(255,255,255,0.08);
+    color: #fff;
+    transition: border-color 0.15s;
+  }
+  .upsell-input::placeholder { color: rgba(255,255,255,0.25); font-weight: 500; }
+  .upsell-input:focus { outline: none; border-color: var(--orange); }
+  .upsell-input.has-value ~ .u-sign { display: none; }
+  .upsell-results {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+    margin-top: 12px;
+  }
+  .upsell-stat {
+    background: rgba(255,255,255,0.07);
+    border-radius: var(--radius-sm);
+    padding: 11px 13px;
+    border: 1px solid rgba(255,255,255,0.08);
+  }
+  .upsell-stat-label {
+    font-size: 10px;
+    font-weight: 700;
+    color: rgba(255,255,255,0.4);
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    margin-bottom: 5px;
+  }
+  .upsell-stat-value { font-size: 22px; font-weight: 800; color: #fff; }
+  .upsell-stat-value.clr-green { color: #4dd98a; }
+  .upsell-stat-value.clr-orange { color: #f5a04a; }
+
+  /* SETTINGS PANEL INTERNALS */
+  .settings-card {
+    background: var(--gray-bg);
+    border-radius: var(--radius);
+    overflow: hidden;
+    margin-bottom: 0;
+  }
+  .settings-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 14px 16px;
+    border-bottom: 1px solid var(--gray-mid);
+    gap: 12px;
+  }
+  .settings-row:last-child { border-bottom: none; }
+  .settings-label { font-size: 14px; font-weight: 700; color: var(--dark); }
+  .settings-sub { font-size: 12px; color: var(--gray-text); margin-top: 2px; font-weight: 400; }
+  .pos-btns { display: flex; gap: 6px; flex-shrink: 0; }
+  .pos-btn {
+    padding: 8px 14px;
+    border-radius: 20px;
+    border: 1.5px solid #c8c4bc;
+    background: #fff;
+    color: var(--dark);
+    font-size: 12px;
+    font-weight: 700;
+    font-family: 'DM Sans', sans-serif;
+    cursor: pointer;
+    transition: all 0.15s;
+    white-space: nowrap;
+  }
+  .pos-btn:hover { border-color: var(--orange); color: var(--orange); }
+  .pos-btn.active { background: var(--orange); border-color: var(--orange); color: #fff; }
+  .threshold-badge {
+    display: inline-block;
+    background: var(--green-light);
+    color: var(--green);
+    font-size: 13px;
+    font-weight: 800;
+    padding: 5px 12px;
+    border-radius: 20px;
+    border: 1px solid #7ec4a0;
+    flex-shrink: 0;
+  }
+  .rate-badge { font-size: 16px; font-weight: 800; color: var(--orange); flex-shrink: 0; }
+  .toggle {
+    position: relative;
+    width: 46px;
+    height: 26px;
+    cursor: pointer;
+    flex-shrink: 0;
+  }
+  .toggle input { opacity: 0; width: 0; height: 0; position: absolute; }
+  .toggle-track { position: absolute; inset: 0; background: #c8c4bc; border-radius: 13px; transition: background 0.2s; }
+  .toggle input:checked ~ .toggle-track { background: var(--orange); }
+  .toggle-thumb {
+    position: absolute;
+    width: 20px; height: 20px;
+    left: 3px; top: 3px;
+    background: #fff;
+    border-radius: 50%;
+    transition: transform 0.2s;
+    pointer-events: none;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.2);
+  }
+  .toggle input:checked ~ .toggle-thumb { transform: translateX(20px); }
+  .bleed-row { display: flex; align-items: center; gap: 8px; flex-shrink: 0; }
+  .bleed-input {
+    width: 68px;
+    padding: 8px 10px;
+    border: var(--border);
+    border-radius: var(--radius-sm);
+    font-size: 14px;
+    font-weight: 700;
+    font-family: 'DM Sans', sans-serif;
+    background: #fff;
+    color: var(--dark);
+    text-align: center;
+  }
+  .bleed-input:focus { outline: none; border-color: var(--orange); }
+  .bleed-unit { font-size: 13px; color: var(--gray-text); font-weight: 600; }
+  .ref-table { width: 100%; border-collapse: collapse; }
+  .ref-table td { padding: 10px 14px; font-size: 14px; border-bottom: 1px solid var(--gray-mid); }
+  .ref-table tr:last-child td { border-bottom: none; }
+  .ref-table td:first-child { font-weight: 500; color: var(--gray-text); }
+  .ref-table td:last-child { font-weight: 700; color: var(--dark); text-align: right; }
+
+  /* HOURS CALCULATOR */
+  .time-input-wrap {
+    display: flex;
+    gap: 6px;
+    align-items: center;
+  }
+  .time-field {
+    flex: 1;
+    padding: 11px 12px;
+    border: var(--border);
+    border-radius: var(--radius-sm);
+    font-size: 15px;
+    font-weight: 600;
+    font-family: 'DM Sans', sans-serif;
+    background: #fff;
+    color: var(--dark);
+    transition: border-color 0.15s;
+  }
+  .time-field:focus { outline: none; border-color: var(--orange); }
+  .ampm-toggle {
+    display: flex;
+    border-radius: var(--radius-sm);
+    overflow: hidden;
+    border: 1.5px solid var(--gray-mid);
+    flex-shrink: 0;
+  }
+  .ampm-btn {
+    padding: 8px 10px;
+    font-size: 12px;
+    font-weight: 700;
+    font-family: 'DM Sans', sans-serif;
+    border: none;
+    background: #fff;
+    color: var(--dark);
+    cursor: pointer;
+    transition: background 0.15s, color 0.15s;
+    letter-spacing: 0.03em;
+  }
+  .ampm-btn + .ampm-btn { border-left: 1.5px solid var(--gray-mid); }
+  .ampm-btn.active { background: var(--dark); color: #fff; }
+
+  .hours-output-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 10px;
+    margin-bottom: 10px;
+  }
+  .hours-stat-card {
+    background: var(--gray-bg);
+    border-radius: var(--radius-sm);
+    padding: 12px 10px;
+    border: 1px solid var(--gray-mid);
+    text-align: center;
+  }
+  .hours-stat-card.highlight {
+    background: var(--green-light);
+    border-color: #7ec4a0;
+  }
+  .hours-stat-label { font-size: 10px; font-weight: 700; color: var(--gray-text); text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 5px; }
+  .hours-stat-card.highlight .hours-stat-label { color: var(--green); }
+  .hours-stat-value { font-size: 22px; font-weight: 800; color: var(--dark); }
+  .hours-stat-card.highlight .hours-stat-value { color: var(--green); }
+
+  .reset-btn {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 10px 20px;
+    background: var(--gray-bg);
+    color: var(--dark);
+    border: 1.5px solid var(--gray-mid);
+    border-radius: 20px;
+    font-size: 13px;
+    font-weight: 700;
+    font-family: 'DM Sans', sans-serif;
+    cursor: pointer;
+    transition: background 0.15s, border-color 0.15s;
+    margin: 0 auto;
+  }
+  .reset-btn:hover { background: var(--gray-mid); border-color: #c8c4bc; }
+
+  @media (min-width: 431px) {
+    body { padding: 20px; align-items: center; }
+    .app { border-radius: 20px; min-height: auto; max-height: 90vh; overflow: hidden; box-shadow: 0 8px 40px rgba(0,0,0,0.18); }
+    .content { overflow-y: auto; max-height: calc(90vh - 110px); }
+    .settings-panel { border-radius: 0 0 var(--radius) var(--radius); }
+  }
+</style>
+</head>
+<body>
+<div class="app">
+
+  <!-- SETTINGS OVERLAY -->
+  <div class="settings-overlay" id="settings-overlay" onclick="handleOverlayClick(event)">
+    <div class="settings-panel" id="settings-panel">
+      <div class="settings-header">
+        <div class="settings-title">⚙ Settings</div>
+        <button class="settings-close" onclick="closeSettings()">✕</button>
+      </div>
+
+      <div class="section-label" style="margin-top:0;">My profile</div>
+      <div class="settings-card">
+        <div class="settings-row">
+          <div>
+            <div class="settings-label">My position</div>
+            <div class="settings-sub">Sets your pay rate &amp; bonus threshold</div>
+          </div>
+          <div class="pos-btns">
+            <button class="pos-btn active" id="pos-captain" onclick="setPosition('captain')">Captain</button>
+            <button class="pos-btn" id="pos-senior" onclick="setPosition('senior')">Sr. Captain</button>
+          </div>
+        </div>
+        <div class="settings-row">
+          <div>
+            <div class="settings-label">Bonus threshold</div>
+            <div class="settings-sub">Target labor % for your role</div>
+          </div>
+          <span class="threshold-badge" id="threshold-display">22%</span>
+        </div>
+        <div class="settings-row">
+          <div>
+            <div class="settings-label">My pay rate</div>
+            <div class="settings-sub">Auto-set by position</div>
+          </div>
+          <span class="rate-badge" id="payrate-display">$18/hr</span>
+        </div>
+      </div>
+
+      <div class="section-label">Bleed time buffer</div>
+      <div class="settings-card">
+        <div class="settings-row">
+          <div>
+            <div class="settings-label">Enable bleed time</div>
+            <div class="settings-sub">Adds buffer for paperwork &amp; gas</div>
+          </div>
+          <label class="toggle">
+            <input type="checkbox" id="bleed-toggle" onchange="onBleedToggle()">
+            <div class="toggle-track"></div>
+            <div class="toggle-thumb"></div>
+          </label>
+        </div>
+        <div class="settings-row" id="bleed-amount-row" style="display:none;">
+          <div>
+            <div class="settings-label">Buffer hours</div>
+            <div class="settings-sub">Added to total labor cost</div>
+          </div>
+          <div class="bleed-row">
+            <input class="bleed-input" type="number" id="bleed-hours" value="0.5" step="0.25" min="0" oninput="saveSettings(); calc();">
+            <span class="bleed-unit">hrs</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="section-label">Pay rates reference</div>
+      <div class="settings-card">
+        <table class="ref-table">
+          <tr><td>Wingman</td><td>$16 / hr</td></tr>
+          <tr><td>Captain</td><td>$18 / hr</td></tr>
+          <tr><td>Senior Captain</td><td>$20 / hr</td></tr>
+        </table>
+      </div>
+
+      <div class="section-label">Default billing rates</div>
+      <div class="settings-card">
+        <table class="ref-table">
+          <tr><td>2 Hunks</td><td>$149 / hr</td></tr>
+          <tr><td>3 Hunks</td><td>$229 / hr</td></tr>
+          <tr><td>4 Hunks</td><td>$309 / hr</td></tr>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- HEADER -->
+  <div class="header">
+    <div class="header-top">
+      <div>
+        <div class="logo-text">College Hunks Hauling Junk</div>
+        <div class="app-title">Crew Tools</div>
+      </div>
+      <button class="gear-btn" id="gear-btn" onclick="toggleSettings()" title="Settings">⚙</button>
+    </div>
+    <div class="tabs">
+      <button class="tab active" onclick="switchTab('job')" id="tab-job">Job</button>
+      <button class="tab" onclick="switchTab('hours')" id="tab-hours">Hours</button>
+    </div>
+  </div>
+
+  <!-- JOB TAB -->
+  <div class="content visible" id="content-job">
+
+    <div class="section-label">Crew with you</div>
+    <div class="card">
+      <div id="crew-rows"></div>
+      <button class="btn-add-crew" id="add-crew-btn" onclick="addCrew()">
+        <span style="font-size:18px;line-height:1;">+</span> Add crew member
+      </button>
+    </div>
+
+    <div class="section-label">Job details</div>
+    <div class="card">
+      <div class="input-row">
+        <div class="input-group">
+          <div class="input-label">Hourly Rate</div>
+          <div class="dollar-wrap">
+            <input class="input-field" type="number" id="hourly-rate" placeholder="149" min="0" oninput="handleDollarInput(this); calc();">
+            <span class="dollar-sign">$</span>
+          </div>
+        </div>
+        <div class="input-group">
+          <div class="input-label">T&amp;T Fee</div>
+          <div class="dollar-wrap">
+            <input class="input-field" type="number" id="tt-fee" placeholder="149" min="0" oninput="handleDollarInput(this); calc();">
+            <span class="dollar-sign">$</span>
+          </div>
+        </div>
+        <div class="input-group full" style="margin-top:10px;">
+          <div class="input-label">Estimated Hours</div>
+          <input class="input-field" type="number" id="est-hours" placeholder="3.0" step="0.25" min="0" oninput="calc()">
+        </div>
+      </div>
+    </div>
+
+    <div class="section-label">Results</div>
+    <div id="results-area">
+      <div class="empty-state">Enter crew and job details above to see your numbers.</div>
+    </div>
+
+    <div class="section-label">Upsell simulator</div>
+    <div class="upsell-section">
+      <div class="upsell-title">If I sell this much in add-ons…</div>
+      <div class="upsell-label">Add-ons sold</div>
+      <div class="upsell-dollar-wrap">
+        <input class="upsell-input" type="number" id="upsell-amount" placeholder="0" min="0" oninput="handleUpsellInput(this); calcUpsell();">
+        <span class="u-sign">$</span>
+      </div>
+      <div class="upsell-results">
+        <div class="upsell-stat">
+          <div class="upsell-stat-label">Labor %</div>
+          <div class="upsell-stat-value" id="upsell-labor-pct">—</div>
+        </div>
+        <div class="upsell-stat">
+          <div class="upsell-stat-label">My Bonus</div>
+          <div class="upsell-stat-value clr-green" id="upsell-bonus">—</div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- HOURS TAB -->
+  <div class="content" id="content-hours">
+
+    <div class="section-label">Clock in</div>
+    <div class="card">
+      <div class="time-input-wrap">
+        <input class="time-field" type="text" id="clock-in" placeholder="7:45" oninput="calcHours()">
+        <div class="ampm-toggle" id="in-ampm">
+          <button class="ampm-btn active" id="in-am" onclick="setAmPm('in','AM')">AM</button>
+          <button class="ampm-btn" id="in-pm" onclick="setAmPm('in','PM')">PM</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="section-label">Clock out</div>
+    <div class="card">
+      <div class="time-input-wrap">
+        <input class="time-field" type="text" id="clock-out" placeholder="2:27" oninput="calcHours()">
+        <div class="ampm-toggle" id="out-ampm">
+          <button class="ampm-btn" id="out-am" onclick="setAmPm('out','AM')">AM</button>
+          <button class="ampm-btn active" id="out-pm" onclick="setAmPm('out','PM')">PM</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="section-label">Break time</div>
+    <div class="card">
+      <div class="input-group">
+        <div class="input-label">Break duration (minutes)</div>
+        <input class="input-field" type="number" id="break-mins" placeholder="0" min="0" oninput="calcHours()">
+      </div>
+    </div>
+
+    <div class="section-label">Results</div>
+    <div id="hours-results-area">
+      <div class="empty-state">Enter clock in and clock out times above.</div>
+    </div>
+
+    <div style="display:flex; justify-content:center; margin-top:20px;">
+      <button class="reset-btn" onclick="resetHours()">
+        ↺ Reset
+      </button>
+    </div>
+
+  </div>
+
+</div>
+
+<script>
+const RATES = { wingman: 16, captain: 18, senior: 20 };
+const BILLING = { 2: 149, 3: 229, 4: 309 };
+const THRESHOLD = { captain: 0.22, senior: 0.23 };
+
+let settings = { position: 'captain', bleedEnabled: false, bleedHours: 0.5 };
+let crewMembers = [];
+let inAmPm = 'AM';
+let outAmPm = 'PM';
+
+/* ── SETTINGS ── */
+function loadSettings() {
+  try {
+    const s = localStorage.getItem('chhj_settings_v3');
+    if (s) settings = { ...settings, ...JSON.parse(s) };
+  } catch(e) {}
+  applySettings();
+}
+
+function saveSettings() {
+  settings.bleedEnabled = document.getElementById('bleed-toggle').checked;
+  const bh = parseFloat(document.getElementById('bleed-hours').value);
+  settings.bleedHours = isNaN(bh) ? 0 : bh;
+  try { localStorage.setItem('chhj_settings_v3', JSON.stringify(settings)); } catch(e) {}
+}
+
+function applySettings() {
+  document.getElementById('pos-captain').classList.toggle('active', settings.position === 'captain');
+  document.getElementById('pos-senior').classList.toggle('active', settings.position === 'senior');
+  const t = settings.position === 'senior' ? 23 : 22;
+  document.getElementById('threshold-display').textContent = t + '%';
+  const rate = settings.position === 'senior' ? 20 : 18;
+  document.getElementById('payrate-display').textContent = '$' + rate + '/hr';
+  document.getElementById('bleed-toggle').checked = settings.bleedEnabled;
+  document.getElementById('bleed-hours').value = settings.bleedHours;
+  document.getElementById('bleed-amount-row').style.display = settings.bleedEnabled ? 'flex' : 'none';
+}
+
+function setPosition(pos) {
+  settings.position = pos;
+  applySettings();
+  saveSettings();
+  calc();
+}
+
+function onBleedToggle() {
+  saveSettings();
+  applySettings();
+  calc();
+}
+
+function toggleSettings() {
+  const overlay = document.getElementById('settings-overlay');
+  const btn = document.getElementById('gear-btn');
+  const isOpen = overlay.classList.contains('open');
+  overlay.classList.toggle('open', !isOpen);
+  btn.classList.toggle('active', !isOpen);
+}
+
+function closeSettings() {
+  document.getElementById('settings-overlay').classList.remove('open');
+  document.getElementById('gear-btn').classList.remove('active');
+}
+
+function handleOverlayClick(e) {
+  if (e.target === document.getElementById('settings-overlay')) closeSettings();
+}
+
+/* ── TABS ── */
+function switchTab(tab) {
+  document.getElementById('content-job').classList.toggle('visible', tab === 'job');
+  document.getElementById('content-hours').classList.toggle('visible', tab === 'hours');
+  document.getElementById('tab-job').classList.toggle('active', tab === 'job');
+  document.getElementById('tab-hours').classList.toggle('active', tab === 'hours');
+}
+
+/* ── CREW ── */
+function addCrew() {
+  if (crewMembers.length >= 3) return;
+  crewMembers.push('wingman');
+  renderCrew();
+  updateBillingDefaults();
+  calc();
+}
+
+function removeCrew(i) {
+  crewMembers.splice(i, 1);
+  renderCrew();
+  updateBillingDefaults();
+  calc();
+}
+
+function changeCrewPosition(i, val) {
+  crewMembers[i] = val;
+  calc();
+}
+
+function renderCrew() {
+  const container = document.getElementById('crew-rows');
+  if (crewMembers.length === 0) {
+    container.innerHTML = '<div style="font-size:13px;color:var(--gray-text);font-weight:500;margin-bottom:10px;">Just you on this job — add crew members below.</div>';
+  } else {
+    container.innerHTML = crewMembers.map((pos, i) => `
+      <div class="crew-row">
+        <select class="position-select" onchange="changeCrewPosition(${i}, this.value)">
+          <option value="wingman" ${pos==='wingman'?'selected':''}>Wingman — $16/hr</option>
+          <option value="captain" ${pos==='captain'?'selected':''}>Captain — $18/hr</option>
+          <option value="senior" ${pos==='senior'?'selected':''}>Sr. Captain — $20/hr</option>
+        </select>
+        <button class="btn-remove" onclick="removeCrew(${i})" title="Remove">✕</button>
+      </div>
+    `).join('');
+  }
+  document.getElementById('add-crew-btn').disabled = crewMembers.length >= 3;
+}
+
+function updateBillingDefaults() {
+  const totalHunks = Math.min(Math.max(1 + crewMembers.length, 2), 4);
+  const rate = BILLING[totalHunks] || 309;
+  const hrField = document.getElementById('hourly-rate');
+  const ttField = document.getElementById('tt-fee');
+  hrField.value = rate;
+  ttField.value = rate;
+  handleDollarInput(hrField);
+  handleDollarInput(ttField);
+}
+
+function handleDollarInput(input) {
+  input.classList.toggle('has-value', input.value !== '');
+}
+
+function handleUpsellInput(input) {
+  input.classList.toggle('has-value', input.value !== '');
+}
+
+function getTotalLaborPerHour() {
+  return RATES[settings.position] + crewMembers.reduce((sum, pos) => sum + RATES[pos], 0);
+}
+
+/* ── JOB CALC ── */
+function calc() {
+  const hourlyRate = parseFloat(document.getElementById('hourly-rate').value) || 0;
+  const ttFee = parseFloat(document.getElementById('tt-fee').value) || 0;
+  const estHours = parseFloat(document.getElementById('est-hours').value) || 0;
+  const area = document.getElementById('results-area');
+
+  if (!hourlyRate || !estHours) {
+    area.innerHTML = '<div class="empty-state">Enter job details above to see your numbers.</div>';
+    calcUpsell();
+    return;
+  }
+
+  const laborPerHour = getTotalLaborPerHour();
+  const bleedExtra = (settings.bleedEnabled && settings.bleedHours > 0) ? laborPerHour * settings.bleedHours : 0;
+  const totalRevenue = (hourlyRate * estHours) + ttFee;
+  const totalLabor = (laborPerHour * estHours) + bleedExtra;
+  const laborPct = totalLabor / totalRevenue;
+  const threshold = THRESHOLD[settings.position];
+  const upsellNeeded = (totalLabor / threshold) - totalRevenue;
+  const alreadyBonus = laborPct <= threshold;
+  const bonusAmount = alreadyBonus ? (threshold - laborPct) * totalRevenue : 0;
+
+  let html = `<div class="output-grid">
+    <div class="stat-card"><div class="stat-label">Total Revenue</div><div class="stat-value">$${totalRevenue.toFixed(0)}</div></div>
+    <div class="stat-card"><div class="stat-label">Total Labor</div><div class="stat-value">$${totalLabor.toFixed(0)}</div></div>
+  </div>`;
+
+  if (alreadyBonus) {
+    html += `<div class="result-card in-bonus">
+      <div class="rc-label">🎉 Already in bonus territory!</div>
+      <div class="rc-value">$${bonusAmount.toFixed(2)}</div>
+      <div class="rc-sub">Labor at ${(laborPct*100).toFixed(2)}% — target is ${(threshold*100).toFixed(0)}%</div>
+    </div>`;
+  } else {
+    html += `<div class="result-card need-upsell">
+      <div class="rc-label">Upsells needed to bonus</div>
+      <div class="rc-value">$${Math.ceil(upsellNeeded).toLocaleString()}</div>
+      <div class="rc-sub">Labor at ${(laborPct*100).toFixed(2)}% — need to reach ${(threshold*100).toFixed(0)}%</div>
+    </div>`;
+  }
+
+  if (settings.bleedEnabled && settings.bleedHours > 0) {
+    html += `<p class="bleed-note">Includes ${settings.bleedHours}hr bleed buffer (+$${bleedExtra.toFixed(0)} labor)</p>`;
+  }
+
+  area.innerHTML = html;
+  calcUpsell();
+}
+
+function calcUpsell() {
+  const hourlyRate = parseFloat(document.getElementById('hourly-rate').value) || 0;
+  const ttFee = parseFloat(document.getElementById('tt-fee').value) || 0;
+  const estHours = parseFloat(document.getElementById('est-hours').value) || 0;
+  const upsellAmt = parseFloat(document.getElementById('upsell-amount').value) || 0;
+  const laborEl = document.getElementById('upsell-labor-pct');
+  const bonusEl = document.getElementById('upsell-bonus');
+
+  if (!hourlyRate || !estHours) {
+    laborEl.textContent = '—'; laborEl.className = 'upsell-stat-value';
+    bonusEl.textContent = '—'; bonusEl.className = 'upsell-stat-value clr-green';
+    return;
+  }
+
+  const laborPerHour = getTotalLaborPerHour();
+  const bleedExtra = (settings.bleedEnabled && settings.bleedHours > 0) ? laborPerHour * settings.bleedHours : 0;
+  const totalRevenue = (hourlyRate * estHours) + ttFee + upsellAmt;
+  const totalLabor = (laborPerHour * estHours) + bleedExtra;
+  const laborPct = totalLabor / totalRevenue;
+  const threshold = THRESHOLD[settings.position];
+  const bonus = Math.max(0, (threshold - laborPct) * totalRevenue);
+
+  laborEl.textContent = (laborPct * 100).toFixed(2) + '%';
+  laborEl.className = 'upsell-stat-value ' + (laborPct <= threshold ? 'clr-green' : 'clr-orange');
+  bonusEl.textContent = '$' + bonus.toFixed(2);
+  bonusEl.className = 'upsell-stat-value ' + (bonus > 0 ? 'clr-green' : '');
+}
+
+/* ── HOURS CALC ── */
+function setAmPm(which, val) {
+  if (which === 'in') {
+    inAmPm = val;
+    document.getElementById('in-am').classList.toggle('active', val === 'AM');
+    document.getElementById('in-pm').classList.toggle('active', val === 'PM');
+  } else {
+    outAmPm = val;
+    document.getElementById('out-am').classList.toggle('active', val === 'AM');
+    document.getElementById('out-pm').classList.toggle('active', val === 'PM');
+  }
+  calcHours();
+}
+
+function parseTimeToMinutes(timeStr, ampm) {
+  if (!timeStr) return null;
+  // Accept formats: "7:45", "745", "7", "12:00"
+  timeStr = timeStr.trim().replace(/[^0-9:]/g, '');
+  let h, m;
+  if (timeStr.includes(':')) {
+    const parts = timeStr.split(':');
+    h = parseInt(parts[0], 10);
+    m = parseInt(parts[1], 10) || 0;
+  } else if (timeStr.length >= 3) {
+    // e.g. "745" → 7:45, "1245" → 12:45
+    const mPart = timeStr.slice(-2);
+    const hPart = timeStr.slice(0, timeStr.length - 2);
+    h = parseInt(hPart, 10);
+    m = parseInt(mPart, 10);
+  } else {
+    h = parseInt(timeStr, 10);
+    m = 0;
+  }
+  if (isNaN(h) || isNaN(m)) return null;
+  // Clamp
+  m = Math.min(59, Math.max(0, m));
+  h = Math.min(12, Math.max(1, h));
+  // Convert to 24h
+  if (ampm === 'AM') {
+    if (h === 12) h = 0; // 12 AM = midnight = 0
+  } else {
+    if (h !== 12) h += 12; // 12 PM stays 12, others add 12
+  }
+  return h * 60 + m;
+}
+
+function calcHours() {
+  const inVal = document.getElementById('clock-in').value;
+  const outVal = document.getElementById('clock-out').value;
+  const breakMins = parseFloat(document.getElementById('break-mins').value) || 0;
+  const area = document.getElementById('hours-results-area');
+
+  if (!inVal.trim() || !outVal.trim()) {
+    area.innerHTML = '<div class="empty-state">Enter clock in and clock out times above.</div>';
+    return;
+  }
+
+  let inMins = parseTimeToMinutes(inVal, inAmPm);
+  let outMins = parseTimeToMinutes(outVal, outAmPm);
+
+  if (inMins === null || outMins === null) {
+    area.innerHTML = '<div class="empty-state">Please enter valid times (e.g. 7:45 or 2:27).</div>';
+    return;
+  }
+
+  // Only add 24hrs if it genuinely crosses midnight (out is numerically before in AND different AM/PM wouldn't account for it)
+  if (outMins < inMins) outMins += 24 * 60;
+
+  const totalMins = outMins - inMins;
+  const netMins = Math.max(0, totalMins - breakMins);
+
+  const totalDecimal = parseFloat((totalMins / 60).toFixed(2));
+  const breakDecimal = parseFloat((breakMins / 60).toFixed(2));
+  const netDecimal = parseFloat((netMins / 60).toFixed(2));
+
+  area.innerHTML = `
+    <div class="hours-output-grid">
+      <div class="hours-stat-card">
+        <div class="hours-stat-label">Total Hours</div>
+        <div class="hours-stat-value">${totalDecimal.toFixed(2)}</div>
+      </div>
+      <div class="hours-stat-card">
+        <div class="hours-stat-label">Break</div>
+        <div class="hours-stat-value">${breakDecimal.toFixed(2)}</div>
+      </div>
+      <div class="hours-stat-card highlight">
+        <div class="hours-stat-label">Net Hours</div>
+        <div class="hours-stat-value">${netDecimal.toFixed(2)}</div>
+      </div>
+    </div>
+  `;
+}
+
+function resetHours() {
+  document.getElementById('clock-in').value = '';
+  document.getElementById('clock-out').value = '';
+  document.getElementById('break-mins').value = '';
+  inAmPm = 'AM'; outAmPm = 'PM';
+  document.getElementById('in-am').classList.add('active');
+  document.getElementById('in-pm').classList.remove('active');
+  document.getElementById('out-am').classList.remove('active');
+  document.getElementById('out-pm').classList.add('active');
+  document.getElementById('hours-results-area').innerHTML = '<div class="empty-state">Enter clock in and clock out times above.</div>';
+}
+
+loadSettings();
+renderCrew();
+updateBillingDefaults();
+</script>
+</body>
+</html>
